@@ -44,6 +44,7 @@ Building
     cd gollector
     export GOPATH=$PWD
     go get -d github.com/otoolep/gollector
+    go get gopkg.in/check.v1
     go build github.com/otoolep/gollector
 
 Running
