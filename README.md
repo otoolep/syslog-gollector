@@ -9,6 +9,8 @@ The logs lines must be [RFC5424](http://tools.ietf.org/html/rfc5424) compliant, 
 
 Consult the RFC to learn what each of these fields is. The TIMESTAMP field must be in [RFC3339](http://www.ietf.org/rfc/rfc3339.txt) format. MSGID must be '-' (nil). Lines not matching this format are dropped by the gollector.
 
+Checking out the "Running" section for hints on how to suitably configure Syslog clients.
+
 Multi-line Support
 ------------
 The gollector supports multi-line messages, so messages such as stack traces will be considered a single message.
