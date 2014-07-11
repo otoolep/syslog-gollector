@@ -29,8 +29,8 @@ With parsing disabled, the line is written as is to Kafka. With parsing enabled,
         "priority":134,
         "version":1,
         "timestamp":"2013-09-04T10:25:52.618085",
-        "host":"ubuntu","app":
-        "sshd",
+        "host":"ubuntu",
+        "app":"sshd",
         "pid":1999,
         "message":
         "password accepted for user root"
