@@ -7,7 +7,7 @@ The logs lines must be [RFC5424](http://tools.ietf.org/html/rfc5424) compliant, 
 
     <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROC-ID MSGID MSG"
 
-Consult the RFC to learn what each of these fields is. The TIMESTAMP field must be in [RRC3339](http://www.ietf.org/rfc/rfc3339.txt) format. MSGID must be '-' (nil). Lines not matching this format are dropped by the gollector.
+Consult the RFC to learn what each of these fields is. The TIMESTAMP field must be in [RFC3339](http://www.ietf.org/rfc/rfc3339.txt) format. MSGID must be '-' (nil). Lines not matching this format are dropped by the gollector.
 
 Multi-line Support
 ------------
