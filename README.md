@@ -65,4 +65,4 @@ This code is still work-in-progress. Key work items remaining include:
 * The gollector needs to be GC-profiled.
 * Clean shutdown, including the use of control channels.
 * UDP support.
-
+* Support arbritrary MSGIDs.
