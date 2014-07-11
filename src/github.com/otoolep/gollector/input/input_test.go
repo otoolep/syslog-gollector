@@ -99,6 +99,10 @@ func (s *InputSuite) Test_SuccessfulParsing(c *C) {
 	m = p.Parse("<1>0 2013-09-04T10:25:52.618085 test.com cron 65535 - password accepted")
 	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, Message: "password accepted"}
 	c.Assert(*m, Equals, e)
+
+	m = p.Parse("<1>0 2013-09-04T10:25:52.618085 test.com cron 65535 - JVM NPE\nsome_file.java:48\nsome_other_file.java:902")
+	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, Message: "JVM NPE\nsome_file.java:48\nsome_other_file.java:902"}
+	c.Assert(*m, Equals, e)
 }
 
 func (s *InputSuite) Test_FailedParsing(c *C) {

@@ -25,7 +25,7 @@ type ParsedMessage struct {
 // Returns an initialized Rfc5424Parser.
 func NewRfc5424Parser() *Rfc5424Parser {
 	p := &Rfc5424Parser{}
-	r := regexp.MustCompile(`<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s-\s(.+)$`)
+	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s-\s(.+$)`)
 	p.regex = r
 	return p
 }
