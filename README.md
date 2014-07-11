@@ -40,12 +40,18 @@ This parsed form may be useful to downstream consumers.
 Building
 ------------
 
+    git clone git@github.com:otoolep/syslog-gollector.git
+    cd syslog-gollector
+    export GOPATH=$PWD
+    go get -d github.com/otoolep/gollector
+    go build github.com/otoolep/gollector
+
 Running
 ------------
 
 Execute
 
-        gollector --help
+        gollector -h
 
 for runtime options.
 
