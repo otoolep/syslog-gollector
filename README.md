@@ -54,7 +54,15 @@ Execute
 
         gollector -h
 
-for command-line options. Make sure your Kafka cluster is up and running first.
+for command-line options.
+
+Make sure your Kafka cluster is up and running first. Point your syslog clients at the gollector, ensuring the message format is what gollector expects. Both [rsyslog](http://www.rsyslog.com/) and [syslog-ng](http://www.balabit.com/network-security/syslog-ng) support templating, which make it easy to format messages correctly. For example, an rsyslog template looks like so:
+
+    $template gollector,"<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% - %msg%\n"
+
+syslog-ng looks like so:
+
+    template gollector { template("<${PRI}>1 ${ISODATE} ${HOST} ${PROGRAM} ${PID} - $MSG\n"); template_escape(no) };
 
 Dependencies
 ------------
