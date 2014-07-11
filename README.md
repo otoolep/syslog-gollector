@@ -75,3 +75,4 @@ This code is still work-in-progress. Key work items remaining include:
 * Clean shutdown, including the use of control channels.
 * UDP support.
 * Support arbritrary MSGIDs.
+* Throughput needs to be measured.
