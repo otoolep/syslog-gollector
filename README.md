@@ -55,3 +55,14 @@ Execute
 
 for runtime options.
 
+TODO
+------------
+This code is still work-in-progress. Key work items remaining include:
+
+* Basic stats via a HTTP API on the gollector.
+* Output to statsd.
+* Handle errors from sarama QueueMessage() call.
+* The gollector needs to be GC-profiled.
+* Clean shutdown, including the use of control channels.
+* UDP support.
+
