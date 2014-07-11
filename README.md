@@ -55,6 +55,15 @@ Execute
 
 for command-line options. Make sure your Kafka cluster is up and running first.
 
+Dependencies
+------------
+The most significant dependencies are:
+
+* The Kafka 0.8 client [sarama](https://github.com/Shopify/sarama).
+* The unit-test framework [Package check](https://gopkg.in/check.v1).
+
+Thanks to the creators of both.
+
 TODO
 ------------
 This code is still work-in-progress. Key work items remaining include:
