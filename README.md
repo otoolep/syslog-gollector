@@ -53,7 +53,7 @@ Execute
 
         gollector -h
 
-for runtime options.
+for command-line options. Make sure your Kafka cluster is up and running first.
 
 TODO
 ------------
