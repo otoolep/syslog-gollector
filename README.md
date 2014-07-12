@@ -42,12 +42,12 @@ This parsed form may be useful to downstream consumers.
 Building
 ------------
 
-    git clone git@github.com:otoolep/gollector.git
-    cd gollector
+    git clone git@github.com:otoolep/syslog-gollector.git
+    cd syslog-gollector
     export GOPATH=$PWD
-    go get -d github.com/otoolep/gollector
+    go get -d github.com/otoolep/syslog-gollector
     go get gopkg.in/check.v1
-    go build github.com/otoolep/gollector
+    go build github.com/otoolep/syslog-gollector
 
 Running
 ------------
