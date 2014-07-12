@@ -1,25 +1,25 @@
-gollector
+syslog-gollector
 ========
 
-*gollector* is a Syslog Collector, written in [Go](http://golang.org/), which has support for streaming received messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. The messages can be written to Kafka in parsed format, or written exactly as received.
+*syslog-gollector* is a Syslog Collector, written in [Go](http://golang.org/), which has support for streaming received messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. The messages can be written to Kafka in parsed format, or written exactly as received.
 
 The logs lines must be [RFC5424](http://tools.ietf.org/html/rfc5424) compliant, and in the following format:
 
     <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROC-ID MSGID MSG"
 
-Consult the RFC to learn what each of these fields is. The TIMESTAMP field must be in [RFC3339](http://www.ietf.org/rfc/rfc3339.txt) format. MSGID must be '-' (nil). Lines not matching this format are dropped by the gollector.
+Consult the RFC to learn what each of these fields is. The TIMESTAMP field must be in [RFC3339](http://www.ietf.org/rfc/rfc3339.txt) format. MSGID must be '-' (nil). Lines not matching this format are dropped by the syslog-gollector.
 
 Checking out the "Running" section for hints on how to suitably configure Syslog clients.
 
 Multi-line Support
 ------------
-The gollector supports multi-line messages, so messages such as stack traces will be considered a single message.
+The syslog-gollector supports multi-line messages, so messages such as stack traces will be considered a single message.
 
 Parsing Mode
 ------------
 Parsing mode is enabled by default. In this mode, the Syslog header is parsed, and the fields become keys in a JSON structure. This JSON structure is then written to Kafka. If parsing mode is not enabled, the log line is written to Kafka as it was received.
 
-For example, imagine the following message is received by the gollector:
+For example, imagine the following message is received by the syslog-gollector:
 
     <134>1 2013-09-04T10:25:52.618085 ubuntu sshd 1999 - password accepted for user root
 
@@ -54,17 +54,17 @@ Running
 
 Execute
 
-        gollector -h
+        syslog-gollector -h
 
 for command-line options.
 
-Make sure your Kafka cluster is up and running first. Point your syslog clients at the gollector, ensuring the message format is what gollector expects. Both [rsyslog](http://www.rsyslog.com/) and [syslog-ng](http://www.balabit.com/network-security/syslog-ng) support templating, which make it easy to format messages correctly. For example, an rsyslog template looks like so:
+Make sure your Kafka cluster is up and running first. Point your syslog clients at the syslog-gollector, ensuring the message format is what syslog-gollector expects. Both [rsyslog](http://www.rsyslog.com/) and [syslog-ng](http://www.balabit.com/network-security/syslog-ng) support templating, which make it easy to format messages correctly. For example, an rsyslog template looks like so:
 
-    $template gollector,"<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% - %msg%\n"
+    $template SyslogGollector,"<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% - %msg%\n"
 
 syslog-ng looks like so:
 
-    template gollector { template("<${PRI}>1 ${ISODATE} ${HOST} ${PROGRAM} ${PID} - $MSG\n"); template_escape(no) };
+    template SyslogGollector { template("<${PRI}>1 ${ISODATE} ${HOST} ${PROGRAM} ${PID} - $MSG\n"); template_escape(no) };
 
 Dependencies
 ------------
@@ -79,10 +79,10 @@ TODO
 ------------
 This code is still work-in-progress. Key work items remaining include:
 
-* Basic stats via a HTTP API on the gollector.
+* Basic stats via a HTTP API on the syslog-gollector.
 * Output to statsd.
 * Handle errors from sarama QueueMessage() call.
-* The gollector needs to be GC-profiled.
+* The syslog-gollector needs to be GC-profiled.
 * Clean shutdown, including the use of control channels.
 * UDP support.
 * Support arbritrary MSGIDs.
