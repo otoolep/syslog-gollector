@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/otoolep/gollector/input"
-	"github.com/otoolep/gollector/output"
+	"github.com/otoolep/syslog-gollector/input"
+	"github.com/otoolep/syslog-gollector/output"
 
 	log "code.google.com/p/log4go"
 )

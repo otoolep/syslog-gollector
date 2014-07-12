@@ -6,4 +6,4 @@ src/github.com/Shopify/
 TODO
 src/github.com/otoolep/gollector/gollector
 *.swp
-gollector
+syslog-gollector

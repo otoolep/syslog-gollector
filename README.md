@@ -87,3 +87,7 @@ This code is still work-in-progress. Key work items remaining include:
 * UDP support.
 * Support arbritrary MSGIDs.
 * Throughput needs to be measured.
+
+Miscellaneous
+------------
+Nothing to do with [gollector/gollector](https://github.com/gollector/gollector).
