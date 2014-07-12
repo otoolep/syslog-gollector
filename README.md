@@ -49,6 +49,8 @@ Building
     go get gopkg.in/check.v1
     go build github.com/otoolep/syslog-gollector
 
+Tested on 64-bit Kubuntu 14.04.
+
 Running
 ------------
 
