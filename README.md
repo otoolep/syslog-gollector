@@ -89,6 +89,7 @@ This code is still work-in-progress. Key work items remaining include:
 * UDP support.
 * Support arbritrary MSGIDs.
 * Throughput needs to be measured.
+* Run the program through Go's race-detector.
 
 Miscellaneous
 ------------
