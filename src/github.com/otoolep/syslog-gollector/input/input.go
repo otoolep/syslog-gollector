@@ -3,6 +3,8 @@ package input
 import (
 	"bufio"
 	"net"
+	"strings"
+
 	"time"
 
 	log "code.google.com/p/log4go"
@@ -10,6 +12,7 @@ import (
 
 const (
 	newlineTimeout = time.Duration(1000 * time.Millisecond)
+	msgBufSize     = 256
 )
 
 // A TcpServer binds to the supplied interface and receives Syslog messages.
@@ -46,7 +49,7 @@ func (s *TcpServer) Start(f func() chan<- string) error {
 
 func (s *TcpServer) handleConnection(conn net.Conn, f func() chan<- string) {
 	defer conn.Close()
-	delimiter := NewDelimiter(256)
+	delimiter := NewDelimiter(msgBufSize)
 	reader := bufio.NewReader(conn)
 	var event string
 	var match bool
@@ -68,4 +71,42 @@ func (s *TcpServer) handleConnection(conn net.Conn, f func() chan<- string) {
 			f() <- event
 		}
 	}
+}
+
+// A UdpServer listens to the supplied interface and receives Syslog messages.
+type UdpServer struct {
+	iface   string
+	udpAddr *net.UDPAddr
+}
+
+// NewUdpServer returns a UDP server.
+func NewUdpServer(iface string) *UdpServer {
+	addr, err := net.ResolveUDPAddr("udp", iface)
+	if err != nil {
+		return nil
+	}
+
+	s := &UdpServer{iface, addr}
+	return s
+}
+
+// Start instructs the UdpServer to start reading packets from the interface.
+func (s *UdpServer) Start(f func() chan<- string) error {
+	conn, err := net.ListenUDP("udp", s.udpAddr)
+	if err != nil {
+		log.Error("failed to start UDP server", err)
+		return err
+	}
+
+	go func() {
+		buf := make([]byte, msgBufSize)
+		for {
+			n, _, err := conn.ReadFromUDP(buf)
+			if err != nil {
+				log.Error("failed to read UDP", err)
+			}
+			f() <- strings.Trim(string(buf[:n]), "\r\n")
+		}
+	}()
+	return nil
 }
