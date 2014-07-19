@@ -78,16 +78,10 @@ Thanks to the creators of both.
 
 TODO
 ------------
-This code is still work-in-progress. Key work items remaining include:
+This code is still work-in-progress, and issues are being tracked. Other key tasks that span multiple issues include:
 
-* Basic stats via a HTTP API on the syslog-gollector.
-* Output to statsd.
-* Handle errors from sarama QueueMessage() call.
 * The syslog-gollector needs to be GC-profiled.
-* Clean shutdown, including the use of control channels.
-* UDP support.
 * Support arbritrary MSGIDs.
-* Throughput needs to be measured.
 * Run the program through Go's race-detector.
 
 Miscellaneous
