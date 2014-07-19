@@ -14,7 +14,8 @@ import (
 )
 
 // Program parameters
-var iface string
+var tcpIface string
+var udpIface string
 var kBrokers string
 var kBatch int
 var kTopic string
@@ -25,7 +26,8 @@ var cCapacity int
 
 // Types
 const (
-	connHost         = "localhost:514"
+	connTcpHost      = "localhost:514"
+	connUdpHost      = "localhost:514"
 	connType         = "tcp"
 	kafkaBatch       = 10
 	kafkaBrokers     = "localhost:9092"
@@ -37,14 +39,15 @@ const (
 )
 
 func init() {
-	flag.StringVar(&iface, "i", connHost, "bind interface")
-	flag.StringVar(&kBrokers, "k", kafkaBrokers, "comma-delimited kafka brokers")
-	flag.StringVar(&kTopic, "t", kafkaTopic, "kafka topic")
-	flag.IntVar(&kBatch, "b", kafkaBatch, "Kafka batch size")
-	flag.IntVar(&kBufferTime, "a", kafkaBufferTime, "Kafka client buffer max time (ms)")
-	flag.IntVar(&kBufferBytes, "e", kafkaBufferBytes, "Kafka client buffer max bytes")
-	flag.BoolVar(&pEnabled, "p", parseEnabled, "enable syslog header parsing")
-	flag.IntVar(&cCapacity, "c", chanCapacity, "channel buffering capacity")
+	flag.StringVar(&tcpIface, "tcp", connTcpHost, "TCP bind interface")
+	flag.StringVar(&udpIface, "udp", connUdpHost, "UDP interface")
+	flag.StringVar(&kBrokers, "broker", kafkaBrokers, "comma-delimited kafka brokers")
+	flag.StringVar(&kTopic, "topic", kafkaTopic, "kafka topic")
+	flag.IntVar(&kBatch, "batch", kafkaBatch, "Kafka batch size")
+	flag.IntVar(&kBufferTime, "maxbuff", kafkaBufferTime, "Kafka client buffer max time (ms)")
+	flag.IntVar(&kBufferBytes, "maxbytes", kafkaBufferBytes, "Kafka client buffer max bytes")
+	flag.BoolVar(&pEnabled, "parse", parseEnabled, "enable syslog header parsing")
+	flag.IntVar(&cCapacity, "chancap", chanCapacity, "channel buffering capacity")
 }
 
 func main() {
@@ -83,21 +86,31 @@ func main() {
 	// Connect to Kafka
 	_, err = output.NewKafkaProducer(prodChan, strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
 	if err != nil {
-		log.Error("unable to create Kafka Producer", err)
+		fmt.Println("Failed to create Kafka producer", err.Error())
 		os.Exit(1)
 	}
 	log.Info("connected to kafka at %s", kBrokers)
 
-	// Start the server
-	tcpServer := input.NewTcpServer(iface)
+	// Start the servers
+	tcpServer := input.NewTcpServer(tcpIface)
 	err = tcpServer.Start(func() chan<- string {
 		return rawChan
 	})
 	if err != nil {
-		fmt.Println("Failed to start server", err.Error())
+		fmt.Println("Failed to start TCP server", err.Error())
 		os.Exit(1)
 	}
-	log.Info("listening on %s for connections", iface)
+	log.Info("listening on %s for TCP connections", tcpIface)
+
+	udpServer := input.NewUdpServer(udpIface)
+	err = udpServer.Start(func() chan<- string {
+		return rawChan
+	})
+	if err != nil {
+		fmt.Println("Failed to start UDP server", err.Error())
+		os.Exit(1)
+	}
+	log.Info("listening on %s for UDP packets", udpIface)
 
 	// Spin forever
 	select {}
