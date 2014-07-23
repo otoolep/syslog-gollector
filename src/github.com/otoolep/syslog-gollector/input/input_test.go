@@ -89,19 +89,23 @@ func (s *InputSuite) Test_SuccessfulParsing(c *C) {
 	p := NewRfc5424Parser()
 
 	m := p.Parse("<134>1 2013-09-04T10:25:52.618085 ubuntu sshd 1999 - password accepted")
-	e := ParsedMessage{Priority: 134, Version: 1, Timestamp: "2013-09-04T10:25:52.618085", Host: "ubuntu", App: "sshd", Pid: 1999, Message: "password accepted"}
+	e := ParsedMessage{Priority: 134, Version: 1, Timestamp: "2013-09-04T10:25:52.618085", Host: "ubuntu", App: "sshd", Pid: 1999, MsgId: "-", Message: "password accepted"}
 	c.Assert(*m, Equals, e)
 
 	m = p.Parse("<33>5 2013-09-04T10:25:52.618085 test.com cron 304 - password accepted")
-	e = ParsedMessage{Priority: 33, Version: 5, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 304, Message: "password accepted"}
+	e = ParsedMessage{Priority: 33, Version: 5, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 304, MsgId: "-", Message: "password accepted"}
 	c.Assert(*m, Equals, e)
 
 	m = p.Parse("<1>0 2013-09-04T10:25:52.618085 test.com cron 65535 - password accepted")
-	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, Message: "password accepted"}
+	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, MsgId: "-", Message: "password accepted"}
+	c.Assert(*m, Equals, e)
+
+	m = p.Parse("<1>0 2013-09-04T10:25:52.618085 test.com cron 65535 msgid1234 password accepted")
+	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, MsgId: "msgid1234", Message: "password accepted"}
 	c.Assert(*m, Equals, e)
 
 	m = p.Parse("<1>0 2013-09-04T10:25:52.618085 test.com cron 65535 - JVM NPE\nsome_file.java:48\n\tsome_other_file.java:902")
-	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, Message: "JVM NPE\nsome_file.java:48\n\tsome_other_file.java:902"}
+	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, MsgId: "-", Message: "JVM NPE\nsome_file.java:48\n\tsome_other_file.java:902"}
 	c.Assert(*m, Equals, e)
 }
 
@@ -112,6 +116,12 @@ func (s *InputSuite) Test_FailedParsing(c *C) {
 	c.Assert(m, IsNil)
 
 	m = p.Parse("<33> 7 2013-09-04T10:25:52.618085 test.com cron 304 - password accepted")
+	c.Assert(m, IsNil)
+
+	m = p.Parse("<33> 7 2013-09-04T10:25:52.618085 test.com cron 304 $ password accepted")
+	c.Assert(m, IsNil)
+
+	m = p.Parse("<33> 7 2013-09-04T10:25:52.618085 test.com cron 304 - - password accepted")
 	c.Assert(m, IsNil)
 
 	m = p.Parse("<33>7 2013-09-04T10:25:52.618085 test.com cron not_a_pid - password accepted")

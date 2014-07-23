@@ -19,13 +19,14 @@ type ParsedMessage struct {
 	Host      string `json:"host"`
 	App       string `json:"app"`
 	Pid       int    `json:"pid"`
+	MsgId     string `json:"msgid"`
 	Message   string `json:"message"`
 }
 
 // Returns an initialized Rfc5424Parser.
 func NewRfc5424Parser() *Rfc5424Parser {
 	p := &Rfc5424Parser{}
-	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s-\s(.+$)`)
+	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s([\w-]+)\s(.+$)`)
 	p.regex = r
 	return p
 }
@@ -56,7 +57,7 @@ func (p *Rfc5424Parser) StreamingParse(in chan string) (chan string, error) {
 // nil is returned.
 func (p *Rfc5424Parser) Parse(raw string) *ParsedMessage {
 	m := p.regex.FindStringSubmatch(raw)
-	if m == nil || len(m) != 8 {
+	if m == nil || len(m) != 9 {
 		return nil
 	}
 
@@ -66,5 +67,5 @@ func (p *Rfc5424Parser) Parse(raw string) *ParsedMessage {
 	ver, _ := strconv.Atoi(m[2])
 	pid, _ := strconv.Atoi(m[6])
 
-	return &ParsedMessage{pri, ver, m[3], m[4], m[5], pid, m[7]}
+	return &ParsedMessage{pri, ver, m[3], m[4], m[5], pid, m[7], m[8]}
 }
