@@ -32,6 +32,7 @@ With parsing disabled, the line is written as is to Kafka. With parsing enabled,
         "host":"ubuntu",
         "app":"sshd",
         "pid":1999,
+        "msgid": "-",
         "message": "password accepted for user root"
     }
 
