@@ -81,7 +81,6 @@ TODO
 ------------
 This code is still work-in-progress, and issues are being tracked. Other key tasks that span multiple issues include:
 
-* The syslog-gollector needs to be GC-profiled.
 * Throughput needs to be measured.
 * Run the program through Go's race-detector.
 
