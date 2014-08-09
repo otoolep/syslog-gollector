@@ -68,14 +68,21 @@ syslog-ng looks like so:
 
     template SyslogGollector { template("<${PRI}>1 ${ISODATE} ${HOST} ${PROGRAM} ${PID} - $MSG\n"); template_escape(no) };
 
+Admin Control
+------------
+The syslog-gollector exposes a number of HTTP endpoints, for configuration and management. The Admin server runs on localhost:8080 by default.
+
+    /statistics
+
 Dependencies
 ------------
 The most significant dependencies are:
 
 * The Kafka 0.8 client [sarama](https://github.com/Shopify/sarama).
 * The unit-test framework [Package check](https://gopkg.in/check.v1).
+* [go-metrics](https://github.com/rcrowley/go-metrics) for statistics support.
 
-Thanks to the creators of both.
+Thanks to the creators of these packages.
 
 TODO
 ------------

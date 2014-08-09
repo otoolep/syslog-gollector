@@ -3,6 +3,7 @@ pkg/
 src/code.google.com/
 src/gopkg.in/
 src/github.com/Shopify/
+src/github.com/rcrowley/
 TODO
 *.swp
 syslog-gollector

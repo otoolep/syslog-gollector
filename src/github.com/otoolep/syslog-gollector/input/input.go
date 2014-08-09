@@ -4,10 +4,10 @@ import (
 	"bufio"
 	"net"
 	"strings"
-
 	"time"
 
 	log "code.google.com/p/log4go"
+	"github.com/rcrowley/go-metrics"
 )
 
 const (
@@ -17,12 +17,23 @@ const (
 
 // A TcpServer binds to the supplied interface and receives Syslog messages.
 type TcpServer struct {
-	iface string
+	iface    string
+	registry metrics.Registry
+	eventsRx metrics.Counter
+	bytesRx  metrics.Counter
 }
 
 // NewTcpServer returns a TCP server.
 func NewTcpServer(iface string) *TcpServer {
-	s := &TcpServer{iface}
+	s := &TcpServer{}
+	s.iface = iface
+
+	s.registry = metrics.NewRegistry()
+	s.eventsRx = metrics.NewCounter()
+	s.bytesRx = metrics.NewCounter()
+	s.registry.Register("events.received", s.eventsRx)
+	s.registry.Register("bytes.received", s.bytesRx)
+
 	return s
 }
 
@@ -68,15 +79,26 @@ func (s *TcpServer) handleConnection(conn net.Conn, f func() chan<- string) {
 			event, match = delimiter.Push(b)
 		}
 		if match {
+			s.eventsRx.Inc(1)
+			s.bytesRx.Inc(int64(len(event)))
 			f() <- event
 		}
 	}
 }
 
+// GetStatistics returns an object storing statistics, which supports JSON
+// marshalling.
+func (s *TcpServer) GetStatistics() (metrics.Registry, error) {
+	return s.registry, nil
+}
+
 // A UdpServer listens to the supplied interface and receives Syslog messages.
 type UdpServer struct {
-	iface   string
-	udpAddr *net.UDPAddr
+	iface    string
+	udpAddr  *net.UDPAddr
+	registry metrics.Registry
+	eventsRx metrics.Counter
+	bytesRx  metrics.Counter
 }
 
 // NewUdpServer returns a UDP server.
@@ -86,7 +108,16 @@ func NewUdpServer(iface string) *UdpServer {
 		return nil
 	}
 
-	s := &UdpServer{iface, addr}
+	s := &UdpServer{}
+	s.iface = iface
+	s.udpAddr = addr
+
+	s.registry = metrics.NewRegistry()
+	s.eventsRx = metrics.NewCounter()
+	s.bytesRx = metrics.NewCounter()
+	s.registry.Register("events.received", s.eventsRx)
+	s.registry.Register("bytes.received", s.bytesRx)
+
 	return s
 }
 
@@ -105,8 +136,16 @@ func (s *UdpServer) Start(f func() chan<- string) error {
 			if err != nil {
 				log.Error("failed to read UDP", err)
 			}
+			s.eventsRx.Inc(1)
+			s.bytesRx.Inc(int64(len(buf)))
 			f() <- strings.Trim(string(buf[:n]), "\r\n")
 		}
 	}()
 	return nil
+}
+
+// GetStatistics returns an object storing statistics, which supports JSON
+// marshalling.
+func (s *UdpServer) GetStatistics() (metrics.Registry, error) {
+	return s.registry, nil
 }
