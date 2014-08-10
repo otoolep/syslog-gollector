@@ -59,6 +59,18 @@ func init() {
 	flag.IntVar(&cCapacity, "chancap", chanCapacity, "channel buffering capacity")
 }
 
+// isPretty returns whether the HTTP response body should be pretty-printed.
+func isPretty(req *http.Request) (bool, error) {
+	err := req.ParseForm()
+	if err != nil {
+		return false, err
+	}
+	if _, ok := req.Form["pretty"]; ok {
+		return true, nil
+	}
+	return false, nil
+}
+
 // ServeStatistics returns the statistics for the program
 func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	statistics := make(map[string]interface{})
@@ -78,7 +90,13 @@ func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	}
 	statistics["udp"] = s
 
-	b, err := json.MarshalIndent(statistics, "", "    ")
+	var b []byte
+	pretty, _ := isPretty(req)
+	if pretty {
+		b, err = json.MarshalIndent(statistics, "", "    ")
+	} else {
+		b, err = json.Marshal(statistics)
+	}
 	if err != nil {
 		log.Error("failed to JSON marshal statistics map")
 		http.Error(w, "failed to JSON marshal statistics map", http.StatusInternalServerError)
