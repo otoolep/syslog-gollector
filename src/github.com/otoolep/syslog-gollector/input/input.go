@@ -15,12 +15,24 @@ const (
 	msgBufSize     = 256
 )
 
-// A TcpServer binds to the supplied interface and receives Syslog messages.
-type TcpServer struct {
+// A server captures attributes common to all servers.
+type server struct {
 	iface    string
 	registry metrics.Registry
 	eventsRx metrics.Counter
 	bytesRx  metrics.Counter
+}
+
+// GetStatistics returns an object storing statistics, which supports JSON
+// marshalling.
+func (s *server) GetStatistics() (metrics.Registry, error) {
+	return s.registry, nil
+}
+
+// A TcpServer binds to the supplied interface and receives Syslog messages.
+type TcpServer struct {
+	server
+	connectionsActive metrics.Counter
 }
 
 // NewTcpServer returns a TCP server.
@@ -31,8 +43,10 @@ func NewTcpServer(iface string) *TcpServer {
 	s.registry = metrics.NewRegistry()
 	s.eventsRx = metrics.NewCounter()
 	s.bytesRx = metrics.NewCounter()
+	s.connectionsActive = metrics.NewCounter()
 	s.registry.Register("events.received", s.eventsRx)
 	s.registry.Register("bytes.received", s.bytesRx)
+	s.registry.Register("connections.Active", s.connectionsActive)
 
 	return s
 }
@@ -59,7 +73,10 @@ func (s *TcpServer) Start(f func() chan<- string) error {
 }
 
 func (s *TcpServer) handleConnection(conn net.Conn, f func() chan<- string) {
+	s.connectionsActive.Inc(1)
 	defer conn.Close()
+	defer s.connectionsActive.Dec(1)
+
 	delimiter := NewDelimiter(msgBufSize)
 	reader := bufio.NewReader(conn)
 	var event string
@@ -86,19 +103,10 @@ func (s *TcpServer) handleConnection(conn net.Conn, f func() chan<- string) {
 	}
 }
 
-// GetStatistics returns an object storing statistics, which supports JSON
-// marshalling.
-func (s *TcpServer) GetStatistics() (metrics.Registry, error) {
-	return s.registry, nil
-}
-
 // A UdpServer listens to the supplied interface and receives Syslog messages.
 type UdpServer struct {
-	iface    string
-	udpAddr  *net.UDPAddr
-	registry metrics.Registry
-	eventsRx metrics.Counter
-	bytesRx  metrics.Counter
+	server
+	udpAddr *net.UDPAddr
 }
 
 // NewUdpServer returns a UDP server.
@@ -142,10 +150,4 @@ func (s *UdpServer) Start(f func() chan<- string) error {
 		}
 	}()
 	return nil
-}
-
-// GetStatistics returns an object storing statistics, which supports JSON
-// marshalling.
-func (s *UdpServer) GetStatistics() (metrics.Registry, error) {
-	return s.registry, nil
 }
