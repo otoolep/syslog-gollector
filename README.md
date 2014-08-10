@@ -74,6 +74,10 @@ The syslog-gollector exposes a number of HTTP endpoints, for configuration and m
 
     /statistics
 
+Adding the query parameter `pretty` to the URL will produce pretty-printed output. For example:
+
+    curl 'localhost:8080/statistics?pretty'
+
 Dependencies
 ------------
 The most significant dependencies are:
