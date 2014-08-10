@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"runtime"
 	"strings"
@@ -14,6 +16,7 @@ import (
 )
 
 // Program parameters
+var adminIface string
 var tcpIface string
 var udpIface string
 var kBrokers string
@@ -24,8 +27,13 @@ var kBufferBytes int
 var pEnabled bool
 var cCapacity int
 
+// Program servers
+var tcpServer *input.TcpServer
+var udpServer *input.UdpServer
+
 // Types
 const (
+	adminHost        = "localhost:8080"
 	connTcpHost      = "localhost:514"
 	connUdpHost      = "localhost:514"
 	connType         = "tcp"
@@ -39,6 +47,7 @@ const (
 )
 
 func init() {
+	flag.StringVar(&adminIface, "admin", adminHost, "Admin interface")
 	flag.StringVar(&tcpIface, "tcp", connTcpHost, "TCP bind interface")
 	flag.StringVar(&udpIface, "udp", connUdpHost, "UDP interface")
 	flag.StringVar(&kBrokers, "broker", kafkaBrokers, "comma-delimited kafka brokers")
@@ -48,6 +57,34 @@ func init() {
 	flag.IntVar(&kBufferBytes, "maxbytes", kafkaBufferBytes, "Kafka client buffer max bytes")
 	flag.BoolVar(&pEnabled, "parse", parseEnabled, "enable syslog header parsing")
 	flag.IntVar(&cCapacity, "chancap", chanCapacity, "channel buffering capacity")
+}
+
+// ServeStatistics returns the statistics for the program
+func ServeStatistics(w http.ResponseWriter, req *http.Request) {
+	statistics := make(map[string]interface{})
+	s, err := tcpServer.GetStatistics()
+	if err != nil {
+		log.Error("failed to get TCP stats")
+		http.Error(w, "failed to get TCP stats", http.StatusInternalServerError)
+		return
+	}
+	statistics["tcp"] = s
+
+	s, err = udpServer.GetStatistics()
+	if err != nil {
+		log.Error("failed to get UDP stats")
+		http.Error(w, "failed to get UDP stats", http.StatusInternalServerError)
+		return
+	}
+	statistics["udp"] = s
+
+	b, err := json.MarshalIndent(statistics, "", "    ")
+	if err != nil {
+		log.Error("failed to JSON marshal statistics map")
+		http.Error(w, "failed to JSON marshal statistics map", http.StatusInternalServerError)
+		return
+	}
+	w.Write(b)
 }
 
 func main() {
@@ -62,6 +99,7 @@ func main() {
 	log.Info("machine has %d cores", runtime.NumCPU())
 
 	// Log config
+	log.Info("Admin server: %s", adminIface)
 	log.Info("kafka brokers: %s", kBrokers)
 	log.Info("kafka topic: %s", kTopic)
 	log.Info("kafka batch size: %d", kBatch)
@@ -83,6 +121,17 @@ func main() {
 		prodChan = rawChan
 	}
 
+	// Configure and start the Admin server
+	http.HandleFunc("/statistics", ServeStatistics)
+	go func() {
+		err = http.ListenAndServe(adminIface, nil)
+		if err != nil {
+			fmt.Println("Failed to start admin server", err.Error())
+			os.Exit(1)
+		}
+	}()
+	log.Info("Admin server started")
+
 	// Connect to Kafka
 	_, err = output.NewKafkaProducer(prodChan, strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
 	if err != nil {
@@ -91,8 +140,8 @@ func main() {
 	}
 	log.Info("connected to kafka at %s", kBrokers)
 
-	// Start the servers
-	tcpServer := input.NewTcpServer(tcpIface)
+	// Start the event servers
+	tcpServer = input.NewTcpServer(tcpIface)
 	err = tcpServer.Start(func() chan<- string {
 		return rawChan
 	})
@@ -102,7 +151,7 @@ func main() {
 	}
 	log.Info("listening on %s for TCP connections", tcpIface)
 
-	udpServer := input.NewUdpServer(udpIface)
+	udpServer = input.NewUdpServer(udpIface)
 	err = udpServer.Start(func() chan<- string {
 		return rawChan
 	})
