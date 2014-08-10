@@ -45,7 +45,7 @@ func NewTcpServer(iface string) *TcpServer {
 	s.bytesRx = metrics.NewCounter()
 	s.connectionsActive = metrics.NewCounter()
 	s.registry.Register("events.received", s.eventsRx)
-	s.registry.Register("bytes.received", s.bytesRx)
+	s.registry.Register("events.bytes.received", s.bytesRx)
 	s.registry.Register("connections.Active", s.connectionsActive)
 
 	return s
@@ -124,7 +124,7 @@ func NewUdpServer(iface string) *UdpServer {
 	s.eventsRx = metrics.NewCounter()
 	s.bytesRx = metrics.NewCounter()
 	s.registry.Register("events.received", s.eventsRx)
-	s.registry.Register("bytes.received", s.bytesRx)
+	s.registry.Register("events.bytes.received", s.bytesRx)
 
 	return s
 }
