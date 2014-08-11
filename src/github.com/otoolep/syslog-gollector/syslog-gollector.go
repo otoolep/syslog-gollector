@@ -27,9 +27,10 @@ var kBufferBytes int
 var pEnabled bool
 var cCapacity int
 
-// Program servers
+// Program resources
 var tcpServer *input.TcpServer
 var udpServer *input.UdpServer
+var parser *input.Rfc5424Parser
 
 // Types
 const (
@@ -90,6 +91,14 @@ func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	}
 	statistics["udp"] = s
 
+	s, err = parser.GetStatistics()
+	if err != nil {
+		log.Error("failed to get parser stats")
+		http.Error(w, "failed to get parser stats", http.StatusInternalServerError)
+		return
+	}
+	statistics["parser"] = s
+
 	var b []byte
 	pretty, _ := isPretty(req)
 	if pretty {
@@ -132,7 +141,7 @@ func main() {
 
 	if pEnabled {
 		// Feed the input through the Parser stage
-		parser := input.NewRfc5424Parser()
+		parser = input.NewRfc5424Parser()
 		prodChan, err = parser.StreamingParse(rawChan)
 	} else {
 		// Pass the input directly to the output

@@ -4,11 +4,16 @@ import (
 	"encoding/json"
 	"regexp"
 	"strconv"
+
+	"github.com/rcrowley/go-metrics"
 )
 
 // A Rfc5424Parser parses Syslog messages.
 type Rfc5424Parser struct {
-	regex *regexp.Regexp
+	regex    *regexp.Regexp
+	registry metrics.Registry
+	parsed   metrics.Counter
+	dropped  metrics.Counter
 }
 
 // ParsedMessage represents a fully parsed Syslog message.
@@ -28,7 +33,20 @@ func NewRfc5424Parser() *Rfc5424Parser {
 	p := &Rfc5424Parser{}
 	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s([\w-]+)\s(.+$)`)
 	p.regex = r
+
+	// Initialize metrics
+	p.registry = metrics.NewRegistry()
+	p.parsed = metrics.NewCounter()
+	p.dropped = metrics.NewCounter()
+	p.registry.Register("events.parsed", p.parsed)
+	p.registry.Register("events.dropped", p.dropped)
 	return p
+}
+
+// GetStatistics returns an object storing statistics, which supports JSON
+// marshalling.
+func (p *Rfc5424Parser) GetStatistics() (metrics.Registry, error) {
+	return p.registry, nil
 }
 
 // StreamingParse emits parsed Syslog messages on the returned channel. If
@@ -58,8 +76,10 @@ func (p *Rfc5424Parser) StreamingParse(in chan string) (chan string, error) {
 func (p *Rfc5424Parser) Parse(raw string) *ParsedMessage {
 	m := p.regex.FindStringSubmatch(raw)
 	if m == nil || len(m) != 9 {
+		p.dropped.Inc(1)
 		return nil
 	}
+	p.parsed.Inc(1)
 
 	// Errors are ignored, because the regex shouldn't match if the
 	// following ain't numbers.
