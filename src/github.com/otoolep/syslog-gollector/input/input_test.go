@@ -71,14 +71,36 @@ func (s *InputSuite) Test_VestigeZero(c *C) {
 	c.Assert(m, Equals, "")
 }
 
-func (s *InputSuite) Test_Vestige(c *C) {
+func (s *InputSuite) Test_VestigeNoMatch(c *C) {
 	d := NewDelimiter(256)
 	d.Push('1')
 	d.Push('2')
 	d.Push('\n')
 	m, b := d.Vestige()
+	c.Assert(b, Equals, false)
+	c.Assert(m, Equals, "")
+}
+
+func (s *InputSuite) Test_VestigeMatch(c *C) {
+	d := NewDelimiter(256)
+	line := "<12>3 "
+	for _, char := range line {
+		d.Push(byte(char))
+	}
+	m, b := d.Vestige()
 	c.Assert(b, Equals, true)
-	c.Assert(m, Equals, "12")
+	c.Assert(m, Equals, line)
+}
+
+func (s *InputSuite) Test_VestigeRichMatch(c *C) {
+	d := NewDelimiter(256)
+	line := "<145>1 OOM on line 42, dummy.java\n\tclass_loader.jar"
+	for _, char := range line {
+		d.Push(byte(char))
+	}
+	m, b := d.Vestige()
+	c.Assert(b, Equals, true)
+	c.Assert(m, Equals, line)
 }
 
 /*

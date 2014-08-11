@@ -7,9 +7,10 @@ import (
 )
 
 const (
-	SYSLOG_DELIMITER = `<[0-9]{1,3}>[0-9]\s$`
+	SYSLOG_DELIMITER = `<[0-9]{1,3}>[0-9]\s`
 )
 
+var syslogRegex *regexp.Regexp
 var startRegex *regexp.Regexp
 var runRegex *regexp.Regexp
 
@@ -18,7 +19,8 @@ type Reader interface {
 }
 
 func init() {
-	startRegex = regexp.MustCompile(SYSLOG_DELIMITER)
+	syslogRegex = regexp.MustCompile(SYSLOG_DELIMITER)
+	startRegex = regexp.MustCompile(SYSLOG_DELIMITER + `$`)
 	runRegex = regexp.MustCompile(`\n` + SYSLOG_DELIMITER)
 }
 
@@ -59,9 +61,12 @@ func (self *Delimiter) Push(b byte) (string, bool) {
 }
 
 // Vestige returns the bytes which have been pushed to Delimiter, since
-// the last Syslog message was returned.
+// the last Syslog message was returned, but only if the buffer appears
+// to be a valid syslog message.
 func (self *Delimiter) Vestige() (string, bool) {
-	if len(self.buffer) == 0 {
+	delimiter := syslogRegex.FindIndex(self.buffer)
+	if delimiter == nil {
+		self.buffer = nil
 		return "", false
 	}
 	dispatch := strings.TrimRight(string(self.buffer), "\r\n")
