@@ -75,31 +75,19 @@ func isPretty(req *http.Request) (bool, error) {
 // ServeStatistics returns the statistics for the program
 func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	statistics := make(map[string]interface{})
-	s, err := tcpServer.GetStatistics()
-	if err != nil {
-		log.Error("failed to get TCP stats")
-		http.Error(w, "failed to get TCP stats", http.StatusInternalServerError)
-		return
+	resources := map[string]input.Statistics{"tcp": tcpServer, "udp": udpServer, "parser": parser}
+	for k, v := range resources {
+		s, err := v.GetStatistics()
+		if err != nil {
+			log.Error("failed to get " + k + " stats")
+			http.Error(w, "failed to get "+k+" stats", http.StatusInternalServerError)
+			return
+		}
+		statistics[k] = s
 	}
-	statistics["tcp"] = s
-
-	s, err = udpServer.GetStatistics()
-	if err != nil {
-		log.Error("failed to get UDP stats")
-		http.Error(w, "failed to get UDP stats", http.StatusInternalServerError)
-		return
-	}
-	statistics["udp"] = s
-
-	s, err = parser.GetStatistics()
-	if err != nil {
-		log.Error("failed to get parser stats")
-		http.Error(w, "failed to get parser stats", http.StatusInternalServerError)
-		return
-	}
-	statistics["parser"] = s
 
 	var b []byte
+	var err error
 	pretty, _ := isPretty(req)
 	if pretty {
 		b, err = json.MarshalIndent(statistics, "", "    ")
