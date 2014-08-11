@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/otoolep/syslog-gollector/input"
 	"github.com/otoolep/syslog-gollector/output"
@@ -31,6 +32,9 @@ var cCapacity int
 var tcpServer *input.TcpServer
 var udpServer *input.UdpServer
 var parser *input.Rfc5424Parser
+
+// Diagnostic data
+var startTime time.Time
 
 // Types
 const (
@@ -102,8 +106,24 @@ func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	w.Write(b)
 }
 
+func ServeDiagnostics(w http.ResponseWriter, req *http.Request) {
+	diagnostics := make(map[string]string)
+	diagnostics["started"] = startTime.String()
+	diagnostics["uptime"] = time.Since(startTime).String()
+	var b []byte
+	pretty, _ := isPretty(req)
+	if pretty {
+		b, _ = json.MarshalIndent(diagnostics, "", "    ")
+	} else {
+		b, _ = json.Marshal(diagnostics)
+	}
+	w.Write(b)
+}
+
 func main() {
 	flag.Parse()
+
+	startTime = time.Now()
 
 	hostname, err := os.Hostname()
 	if err != nil {
@@ -138,6 +158,7 @@ func main() {
 
 	// Configure and start the Admin server
 	http.HandleFunc("/statistics", ServeStatistics)
+	http.HandleFunc("/diagnostics", ServeDiagnostics)
 	go func() {
 		err = http.ListenAndServe(adminIface, nil)
 		if err != nil {

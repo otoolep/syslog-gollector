@@ -73,6 +73,7 @@ Admin Control
 The syslog-gollector exposes a number of HTTP endpoints, for configuration and management. The Admin server runs on localhost:8080 by default.
 
     /statistics
+    /diagnostics
 
 Adding the query parameter `pretty` to the URL will produce pretty-printed output. For example:
 
