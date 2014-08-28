@@ -41,15 +41,19 @@ This parsed form may be useful to downstream consumers.
 
 Building
 ------------
-
-    git clone git@github.com:otoolep/syslog-gollector.git
-    cd syslog-gollector
-    export GOPATH=$PWD
-    go get -d github.com/otoolep/syslog-gollector
-    go get gopkg.in/check.v1
-    go build github.com/otoolep/syslog-gollector
-
 Tested on 64-bit Kubuntu 14.04.
+
+    mkdir ~/syslog-gollector # Or a directory of your choice.
+    cd ~/syslog-gollector
+    export GOPATH=$PWD
+    go get github.com/otoolep/syslog-gollector
+    go install github.com/otoolep/syslog-gollector
+
+To run the tests execute:
+
+    go get gopkg.in/check.v1
+    go test github.com/otoolep/syslog-gollector/...
+
 
 Running
 ------------
