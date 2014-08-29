@@ -57,8 +57,7 @@ To run the tests execute:
 
 Running
 ------------
-
-Execute
+The binary will be located in the ```pkg``` directory. Execute
 
         syslog-gollector -h
 
