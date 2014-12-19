@@ -1,11 +1,9 @@
 package output
 
 import (
-	"time"
-
 	log "code.google.com/p/log4go"
 
-	"github.com/Shopify/sarama"
+	"github.com/otoolep/sarama"
 )
 
 // A KafkaProducer encapsulates a connection to a Kafka cluster.
@@ -26,7 +24,7 @@ func NewKafkaProducer(msgChan <-chan string, brokers []string, topic string, buf
 	producerConfig := sarama.NewProducerConfig()
 	producerConfig.Partitioner = sarama.NewRandomPartitioner()
 	producerConfig.MaxBufferedBytes = uint32(bufferBytes)
-	producerConfig.MaxBufferTime = time.Duration(bufferTime) * time.Millisecond
+	producerConfig.MaxBufferTime = uint32(bufferTime)
 	producer, err := sarama.NewProducer(client, producerConfig)
 	if err != nil {
 		log.Error("failed to create kafka producer", err)
