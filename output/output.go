@@ -37,6 +37,14 @@ func NewKafkaProducer(msgChan <-chan string, brokers []string, topic string, buf
 		}
 	}()
 
+	go func() {
+		for producer_error := range producer.Errors() {
+			if producer_error != nil {
+				log.Error("Error from producer.QueueMessage: ", producer_error)
+			}
+		}
+	}()
+
 	log.Info("kafka producer created")
 	return self, nil
 }
