@@ -156,26 +156,6 @@ func main() {
 		prodChan = rawChan
 	}
 
-	// Configure and start the Admin server
-	http.HandleFunc("/statistics", ServeStatistics)
-	http.HandleFunc("/diagnostics", ServeDiagnostics)
-	go func() {
-		err = http.ListenAndServe(adminIface, nil)
-		if err != nil {
-			fmt.Println("Failed to start admin server", err.Error())
-			os.Exit(1)
-		}
-	}()
-	log.Info("Admin server started")
-
-	// Connect to Kafka
-	_, err = output.NewKafkaProducer(prodChan, strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
-	if err != nil {
-		fmt.Println("Failed to create Kafka producer", err.Error())
-		os.Exit(1)
-	}
-	log.Info("connected to kafka at %s", kBrokers)
-
 	// Start the event servers
 	tcpServer = input.NewTcpServer(tcpIface)
 	err = tcpServer.Start(func() chan<- string {
@@ -196,6 +176,26 @@ func main() {
 		os.Exit(1)
 	}
 	log.Info("listening on %s for UDP packets", udpIface)
+
+	// Configure and start the Admin server
+	http.HandleFunc("/statistics", ServeStatistics)
+	http.HandleFunc("/diagnostics", ServeDiagnostics)
+	go func() {
+		err = http.ListenAndServe(adminIface, nil)
+		if err != nil {
+			fmt.Println("Failed to start admin server", err.Error())
+			os.Exit(1)
+		}
+	}()
+	log.Info("Admin server started")
+
+	// Connect to Kafka
+	_, err = output.NewKafkaProducer(prodChan, strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
+	if err != nil {
+		fmt.Println("Failed to create Kafka producer", err.Error())
+		os.Exit(1)
+	}
+	log.Info("connected to kafka at %s", kBrokers)
 
 	// Spin forever
 	select {}
