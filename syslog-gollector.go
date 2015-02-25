@@ -190,12 +190,13 @@ func main() {
 	log.Info("Admin server started")
 
 	// Connect to Kafka
+	log.Info("attempting to connect to Kafka %s...", kBrokers)
 	_, err = output.NewKafkaProducer(prodChan, strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
 	if err != nil {
 		fmt.Println("Failed to create Kafka producer", err.Error())
 		os.Exit(1)
 	}
-	log.Info("connected to kafka at %s", kBrokers)
+	log.Info("connected to Kafka at %s", kBrokers)
 
 	// Spin forever
 	select {}
