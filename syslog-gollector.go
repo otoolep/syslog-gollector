@@ -147,9 +147,9 @@ func main() {
 	rawChan := make(chan string, cCapacity)
 	prodChan := make(chan string, cCapacity)
 
+	parser = input.NewRfc5424Parser()
 	if pEnabled {
 		// Feed the input through the Parser stage
-		parser = input.NewRfc5424Parser()
 		prodChan, err = parser.StreamingParse(rawChan)
 	} else {
 		// Pass the input directly to the output
