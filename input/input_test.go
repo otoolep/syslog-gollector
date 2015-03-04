@@ -104,7 +104,7 @@ func (s *InputSuite) Test_VestigeRichMatch(c *C) {
 }
 
 /*
- * Rfc5424 parer tests
+ * Rfc5424 parser tests
  */
 
 func (s *InputSuite) Test_SuccessfulParsing(c *C) {
@@ -128,6 +128,18 @@ func (s *InputSuite) Test_SuccessfulParsing(c *C) {
 
 	m = p.Parse("<1>0 2013-09-04T10:25:52.618085 test.com cron 65535 - JVM NPE\nsome_file.java:48\n\tsome_other_file.java:902")
 	e = ParsedMessage{Priority: 1, Version: 0, Timestamp: "2013-09-04T10:25:52.618085", Host: "test.com", App: "cron", Pid: 65535, MsgId: "-", Message: "JVM NPE\nsome_file.java:48\n\tsome_other_file.java:902"}
+	c.Assert(*m, Equals, e)
+
+	m = p.Parse("<27>1 2015-03-02T22:53:45-08:00 localhost.localdomain puppet-agent 5334 - mirrorurls.extend(list(self.metalink_data.urls()))")
+	e = ParsedMessage{Priority: 27, Version: 1, Timestamp: "2015-03-02T22:53:45-08:00", Host: "localhost.localdomain", App: "puppet-agent", Pid: 5334, MsgId: "-", Message: "mirrorurls.extend(list(self.metalink_data.urls()))"}
+	c.Assert(*m, Equals, e)
+
+	m = p.Parse("<29>1 2015-03-03T06:49:08-08:00 localhost.localdomain puppet-agent 51564 - (/Stage[main]/Users_prd/Ssh_authorized_key[1063-username]) Dependency Group[group] has failures: true")
+	e = ParsedMessage{Priority: 29, Version: 1, Timestamp: "2015-03-03T06:49:08-08:00", Host: "localhost.localdomain", App: "puppet-agent", Pid: 51564, MsgId: "-", Message: "(/Stage[main]/Users_prd/Ssh_authorized_key[1063-username]) Dependency Group[group] has failures: true"}
+	c.Assert(*m, Equals, e)
+
+	m = p.Parse("<142>1 2015-03-02T22:23:07-08:00 localhost.localdomain Keepalived_vrrp 21125 - VRRP_Instance(VI_1) ignoring received advertisment...")
+	e = ParsedMessage{Priority: 142, Version: 1, Timestamp: "2015-03-02T22:23:07-08:00", Host: "localhost.localdomain", App: "Keepalived_vrrp", Pid: 21125, MsgId: "-", Message: "VRRP_Instance(VI_1) ignoring received advertisment..."}
 	c.Assert(*m, Equals, e)
 }
 
