@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -110,6 +111,18 @@ func ServeDiagnostics(w http.ResponseWriter, req *http.Request) {
 	diagnostics := make(map[string]string)
 	diagnostics["started"] = startTime.String()
 	diagnostics["uptime"] = time.Since(startTime).String()
+	diagnostics["kafkaBatch"] = strconv.Itoa(kafkaBatch)
+	diagnostics["kBufferTime"] = strconv.Itoa(kBufferTime)
+	diagnostics["kBufferBytes"] = strconv.Itoa(kBufferBytes)
+	diagnostics["cCapacity"] = strconv.Itoa(cCapacity)
+	diagnostics["kTopic"] = kTopic
+
+	if pEnabled {
+		diagnostics["parsing"] = "enabled"
+	} else {
+		diagnostics["parsing"] = "disabled"
+	}
+
 	var b []byte
 	pretty, _ := isPretty(req)
 	if pretty {
