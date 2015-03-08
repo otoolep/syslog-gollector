@@ -23,7 +23,7 @@ For example, imagine the following message is received by the syslog-gollector:
 
     <134>1 2013-09-04T10:25:52.618085 ubuntu sshd 1999 - password accepted for user root
 
-With parsing disabled, the line is written as is to Kafka. With parsing enabled, the following JSON object is written to Kafka:
+With parsing disabled, the line is written as is to Kafka. With parsing enabled, the following JSON object is instead written to Kafka:
 
     {
         "priority":134,
