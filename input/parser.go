@@ -30,8 +30,18 @@ type ParsedMessage struct {
 
 // Returns an initialized Rfc5424Parser.
 func NewRfc5424Parser() *Rfc5424Parser {
-	p := &Rfc5424Parser{}
-	r := regexp.MustCompile(`(?s)<([0-9]{1,3})>([0-9])\s(.+)\s(.+)\s(.+)\s([0-9]{1,5})\s([\w-]+)\s(.+$)`)
+	leading := `(?s)`
+	pri := `<([0-9]{1,3})>`
+	ver := `([0-9])`
+	ts := `([^ ]+)`
+	host := `([^ ]+)`
+	app := `([^ ]+)`
+	pid := `([0-9]{1,5})`
+	id := `([\w-]+)`
+	msg := `(.+$)`
+
+	p := &RFC5424Parser{}
+	r := regexp.MustCompile(leading + pri + ver + `\s` + ts + `\s` + host + `\s` + app + `\s` + pid + `\s` + id + `\s` + msg)
 	p.regex = r
 
 	// Initialize metrics
