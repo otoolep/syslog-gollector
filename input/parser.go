@@ -40,7 +40,7 @@ func NewRfc5424Parser() *Rfc5424Parser {
 	id := `([\w-]+)`
 	msg := `(.+$)`
 
-	p := &RFC5424Parser{}
+	p := &Rfc5424Parser{}
 	r := regexp.MustCompile(leading + pri + ver + `\s` + ts + `\s` + host + `\s` + app + `\s` + pid + `\s` + id + `\s` + msg)
 	p.regex = r
 
