@@ -3,7 +3,7 @@ syslog-gollector [![Circle CI](https://circleci.com/gh/otoolep/syslog-gollector/
 
 *Detailed background on syslog-gollector can be found on [this blog post](http://www.philipotoole.com/writing-a-syslog-collector-in-go/).*
 
-*syslog-gollector* is a Syslog Collector (sometimes called a Syslog Server), written in [Go](http://golang.org/) (golang), which has support for streaming received messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. The messages can be written to Kafka in parsed format, or written exactly as received.
+*syslog-gollector* is a Syslog Collector (sometimes called a Syslog Server), written in [Go](http://golang.org/) (golang), which has support for streaming received log messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. Log messages can be written to Kafka in parsed format, or written exactly as received.
 
 The logs lines must be [RFC5424](http://tools.ietf.org/html/rfc5424) compliant, and in the following format:
 
@@ -15,13 +15,13 @@ Checking out the "Running" section for hints on how to suitably configure Syslog
 
 Multi-line Support
 ------------
-The syslog-gollector supports multi-line messages, so messages such as stack traces will be considered a single message.
+The syslog-gollector supports multi-line log messages, so messages such as stack traces will be considered a single log message.
 
 Parsing Mode
 ------------
 Parsing mode is enabled by default. In this mode, the Syslog header is parsed, and the fields become keys in a JSON structure. This JSON structure is then written to Kafka. If parsing mode is not enabled, the log line is written to Kafka as it was received.
 
-For example, imagine the following message is received by the syslog-gollector:
+For example, imagine the following log line is received by the syslog-gollector:
 
     <134>1 2013-09-04T10:25:52.618085 ubuntu sshd 1999 - password accepted for user root
 
@@ -39,7 +39,6 @@ With parsing disabled, the line is written as is to Kafka. With parsing enabled,
     }
 
 This parsed form may be useful to downstream consumers.
-
 
 Building
 ------------
@@ -65,7 +64,7 @@ The binary will be located in the ```$GOPATH/bin``` directory. Execute
 
 for command-line options.
 
-Make sure your Kafka cluster is up and running first. Point your syslog clients at the syslog-gollector, ensuring the message format is what syslog-gollector expects. Both [rsyslog](http://www.rsyslog.com/) and [syslog-ng](http://www.balabit.com/network-security/syslog-ng) support templating, which make it easy to format messages correctly. For example, an rsyslog template looks like so:
+Make sure your Kafka cluster is up and running first. Point your syslog clients at the syslog-gollector, ensuring the log message format is what syslog-gollector expects. Both [rsyslog](http://www.rsyslog.com/) and [syslog-ng](http://www.balabit.com/network-security/syslog-ng) support templating, which make it easy to format messages correctly. For example, an rsyslog template looks like so:
 
     $template SyslogGollector,"<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% - %msg%\n"
 
