@@ -66,11 +66,11 @@ for command-line options.
 
 Make sure your Kafka cluster is up and running first. Point your syslog clients at the syslog-gollector, ensuring the log message format is what syslog-gollector expects. Both [rsyslog](http://www.rsyslog.com/) and [syslog-ng](http://www.balabit.com/network-security/syslog-ng) support templating, which make it easy to format messages correctly. For example, an rsyslog template looks like so:
 
-    $template SyslogGollector,"<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% - %msg%\n"
+    $template SyslogGollector,"<%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% %procid% - %msg%"
 
 syslog-ng looks like so:
 
-    template SyslogGollector { template("<${PRI}>1 ${ISODATE} ${HOST} ${PROGRAM} ${PID} - $MSG\n"); template_escape(no) };
+    template SyslogGollector { template("<${PRI}>1 ${ISODATE} ${HOST} ${PROGRAM} ${PID} - $MSG"); template_escape(no) };
 
 Admin Control
 ------------
