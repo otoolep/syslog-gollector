@@ -2,12 +2,12 @@ package input
 
 import (
 	"bufio"
+	"log"
 	"net"
 	"strings"
 	"time"
 
-	log "code.google.com/p/log4go"
-	"github.com/rcrowley/go-metrics"
+	_ "github.com/rcrowley/go-metrics"
 )
 
 const (
@@ -62,10 +62,10 @@ func (s *TcpServer) Start(f func() chan<- string) error {
 		for {
 			conn, err := ln.Accept()
 			if err != nil {
-				log.Error("failed to accept connection", err)
+				log.Println("failed to accept connection", err)
 				continue
 			}
-			log.Info("accepted new connection from %s", conn.RemoteAddr().String())
+			log.Println("accepted new connection from %s", conn.RemoteAddr().String())
 			go s.handleConnection(conn, f)
 		}
 	}()
@@ -89,7 +89,7 @@ func (s *TcpServer) handleConnection(conn net.Conn, f func() chan<- string) {
 			if neterr, ok := err.(net.Error); ok && neterr.Timeout() {
 				event, match = delimiter.Vestige()
 			} else {
-				log.Info("Error from connection:", err)
+				log.Println("Error from connection:", err)
 				return
 			}
 		} else {
@@ -133,7 +133,7 @@ func NewUdpServer(iface string) *UdpServer {
 func (s *UdpServer) Start(f func() chan<- string) error {
 	conn, err := net.ListenUDP("udp", s.udpAddr)
 	if err != nil {
-		log.Error("failed to start UDP server", err)
+		log.Println("failed to start UDP server", err)
 		return err
 	}
 
@@ -142,7 +142,7 @@ func (s *UdpServer) Start(f func() chan<- string) error {
 		for {
 			n, _, err := conn.ReadFromUDP(buf)
 			if err != nil {
-				log.Error("failed to read UDP", err)
+				log.Println("failed to read UDP", err)
 			}
 			s.eventsRx.Inc(1)
 			s.bytesRx.Inc(int64(len(buf)))

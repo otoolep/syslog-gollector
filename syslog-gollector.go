@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"runtime"
@@ -14,8 +15,6 @@ import (
 
 	"github.com/otoolep/syslog-gollector/input"
 	"github.com/otoolep/syslog-gollector/output"
-
-	log "code.google.com/p/log4go"
 )
 
 // Program parameters
@@ -87,7 +86,7 @@ func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	for k, v := range resources {
 		s, err := v.GetStatistics()
 		if err != nil {
-			log.Error("failed to get " + k + " stats")
+			log.Println("failed to get " + k + " stats")
 			http.Error(w, "failed to get "+k+" stats", http.StatusInternalServerError)
 			return
 		}
@@ -103,7 +102,7 @@ func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 		b, err = json.Marshal(statistics)
 	}
 	if err != nil {
-		log.Error("failed to JSON marshal statistics map")
+		log.Println("failed to JSON marshal statistics map")
 		http.Error(w, "failed to JSON marshal statistics map", http.StatusInternalServerError)
 		return
 	}
@@ -143,21 +142,20 @@ func main() {
 
 	hostname, err := os.Hostname()
 	if err != nil {
-		log.Error("unable to determine hostname -- aborting")
-		os.Exit(1)
+		log.Fatal("unable to determine hostname -- aborting")
 	}
-	log.Info("syslog server starting on %s, PID %d", hostname, os.Getpid())
-	log.Info("machine has %d cores", runtime.NumCPU())
+	log.Println("syslog server starting on %s, PID %d", hostname, os.Getpid())
+	log.Println("machine has %d cores", runtime.NumCPU())
 
 	// Log config
-	log.Info("Admin server: %s", adminIface)
-	log.Info("kafka brokers: %s", kBrokers)
-	log.Info("kafka topic: %s", kTopic)
-	log.Info("kafka batch size: %d", kBatch)
-	log.Info("kafka buffer time: %dms", kBufferTime)
-	log.Info("kafka buffer bytes: %d", kBufferBytes)
-	log.Info("parsing enabled: %t", pEnabled)
-	log.Info("channel buffering capacity: %d", cCapacity)
+	log.Println("Admin server: %s", adminIface)
+	log.Println("kafka brokers: %s", kBrokers)
+	log.Println("kafka topic: %s", kTopic)
+	log.Println("kafka batch size: %d", kBatch)
+	log.Println("kafka buffer time: %dms", kBufferTime)
+	log.Println("kafka buffer bytes: %d", kBufferBytes)
+	log.Println("parsing enabled: %t", pEnabled)
+	log.Println("channel buffering capacity: %d", cCapacity)
 
 	// Prep the channels
 	rawChan := make(chan string, cCapacity)
@@ -181,7 +179,7 @@ func main() {
 		fmt.Println("Failed to start TCP server", err.Error())
 		os.Exit(1)
 	}
-	log.Info("listening on %s for TCP connections", tcpIface)
+	log.Println("listening on %s for TCP connections", tcpIface)
 
 	udpServer = input.NewUdpServer(udpIface)
 	err = udpServer.Start(func() chan<- string {
@@ -191,7 +189,7 @@ func main() {
 		fmt.Println("Failed to start UDP server", err.Error())
 		os.Exit(1)
 	}
-	log.Info("listening on %s for UDP packets", udpIface)
+	log.Println("listening on %s for UDP packets", udpIface)
 
 	// Configure and start the Admin server
 	http.HandleFunc("/statistics", ServeStatistics)
@@ -203,16 +201,16 @@ func main() {
 			os.Exit(1)
 		}
 	}()
-	log.Info("Admin server started")
+	log.Println("Admin server started")
 
 	// Connect to Kafka
-	log.Info("attempting to connect to Kafka %s...", kBrokers)
+	log.Println("attempting to connect to Kafka %s...", kBrokers)
 	_, err = output.NewKafkaProducer(prodChan, strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
 	if err != nil {
 		fmt.Println("Failed to create Kafka producer", err.Error())
 		os.Exit(1)
 	}
-	log.Info("connected to Kafka at %s", kBrokers)
+	log.Println("connected to Kafka at %s", kBrokers)
 
 	if !noReport {
 		reportLaunch()
