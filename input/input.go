@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/rcrowley/go-metrics"
+	metrics "github.com/rcrowley/go-metrics"
 )
 
 const (
