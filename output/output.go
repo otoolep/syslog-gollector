@@ -1,6 +1,8 @@
 package output
 
 import (
+	"time"
+
 	"github.com/Shopify/sarama"
 )
 
@@ -15,6 +17,8 @@ func NewKafkaProducer(brokers []string, topic string, bufferTime, bufferBytes in
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForLocal     // Only wait for the leader to ack
 	config.Producer.Compression = sarama.CompressionSnappy // Compress messages
+	config.Producer.Flush.Bytes = bufferBytes
+	config.Producer.Flush.Frequency = time.Duration(bufferTime * 1000000)
 
 	p, err := sarama.NewAsyncProducer(brokers, config)
 	if err != nil {
@@ -31,8 +35,7 @@ func NewKafkaProducer(brokers []string, topic string, bufferTime, bufferBytes in
 func (k *KafkaProducer) Write(s string) {
 	k.producer.Input() <- &sarama.ProducerMessage{
 		Topic: k.topic,
-		Key:   sarama.StringEncoder("xxx"),
-		Value: nil,
+		Value: sarama.StringEncoder(s),
 	}
 }
 
