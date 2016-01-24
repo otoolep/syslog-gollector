@@ -146,17 +146,17 @@ func main() {
 		log.Fatal("unable to determine hostname -- aborting")
 	}
 	log.Println("syslog server starting on %s, PID %d", hostname, os.Getpid())
-	log.Println("machine has %d cores", runtime.NumCPU())
+	log.Printf("machine has %d cores", runtime.NumCPU())
 
 	// Log config
-	log.Println("Admin server: %s", adminIface)
-	log.Println("kafka brokers: %s", kBrokers)
-	log.Println("kafka topic: %s", kTopic)
-	log.Println("kafka batch size: %d", kBatch)
-	log.Println("kafka buffer time: %dms", kBufferTime)
-	log.Println("kafka buffer bytes: %d", kBufferBytes)
-	log.Println("parsing enabled: %t", pEnabled)
-	log.Println("channel buffering capacity: %d", cCapacity)
+	log.Println("Admin server:", adminIface)
+	log.Println("kafka brokers:", kBrokers)
+	log.Println("kafka topic:", kTopic)
+	log.Println("kafka batch size:", kBatch)
+	log.Printf("kafka buffer time: %dms", kBufferTime)
+	log.Println("kafka buffer bytes:", kBufferBytes)
+	log.Println("parsing enabled:", pEnabled)
+	log.Println("channel buffering capacity:", cCapacity)
 
 	// Prep the channels
 	rawChan := make(chan string, cCapacity)
@@ -180,7 +180,7 @@ func main() {
 		fmt.Println("Failed to start TCP server", err.Error())
 		os.Exit(1)
 	}
-	log.Println("listening on %s for TCP connections", tcpIface)
+	log.Printf("listening on %s for TCP connections", tcpIface)
 
 	udpServer = input.NewUdpServer(udpIface)
 	err = udpServer.Start(func() chan<- string {
@@ -190,7 +190,7 @@ func main() {
 		fmt.Println("Failed to start UDP server", err.Error())
 		os.Exit(1)
 	}
-	log.Println("listening on %s for UDP packets", udpIface)
+	log.Printf("listening on %s for UDP packets", udpIface)
 
 	// Configure and start the Admin server
 	http.HandleFunc("/statistics", ServeStatistics)
@@ -205,13 +205,13 @@ func main() {
 	log.Println("Admin server started")
 
 	// Connect to Kafka
-	log.Println("attempting to connect to Kafka %s...", kBrokers)
-	kafka, err := output.NewKafkaProducer(strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes, kBatch)
+	log.Println("attempting to connect to Kafka brokers at:", kBrokers)
+	producer, err = output.NewKafkaProducer(strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes, kBatch)
 	if err != nil {
 		fmt.Println("Failed to create Kafka producer", err.Error())
 		os.Exit(1)
 	}
-	log.Println("connected to Kafka at %s", kBrokers)
+	log.Printf("connected to Kafka at %s", kBrokers)
 
 	if !noReport {
 		reportLaunch()
