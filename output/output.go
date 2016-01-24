@@ -13,12 +13,13 @@ type KafkaProducer struct {
 }
 
 // Returns an initialized KafkaProducer.
-func NewKafkaProducer(brokers []string, topic string, bufferTime, bufferBytes int) (*KafkaProducer, error) {
+func NewKafkaProducer(brokers []string, topic string, bufferTime, bufferBytes, batchSz int) (*KafkaProducer, error) {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForLocal     // Only wait for the leader to ack
 	config.Producer.Compression = sarama.CompressionSnappy // Compress messages
 	config.Producer.Flush.Bytes = bufferBytes
 	config.Producer.Flush.Frequency = time.Duration(bufferTime * 1000000)
+	config.Producer.Flush.Messages = batchSz
 
 	p, err := sarama.NewAsyncProducer(brokers, config)
 	if err != nil {
