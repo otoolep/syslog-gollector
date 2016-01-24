@@ -4,12 +4,18 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+
+	metrics "github.com/rcrowley/go-metrics"
 )
 
 // A KafkaProducer encapsulates a connection to a Kafka cluster.
 type KafkaProducer struct {
 	producer sarama.AsyncProducer
 	topic    string
+
+	registry metrics.Registry
+	msgTx    metrics.Counter
+	bytesTx  metrics.Counter
 }
 
 // Returns an initialized KafkaProducer.
@@ -28,7 +34,13 @@ func NewKafkaProducer(brokers []string, topic string, bufferTime, bufferBytes, b
 	k := &KafkaProducer{
 		producer: p,
 		topic:    topic,
+		registry: metrics.NewRegistry(),
+		msgTx:    metrics.NewCounter(),
+		bytesTx:  metrics.NewCounter(),
 	}
+
+	k.registry.Register("messages.transmitted", k.msgTx)
+	k.registry.Register("messages.bytes.transmitted", k.bytesTx)
 
 	return k, nil
 }
@@ -38,6 +50,14 @@ func (k *KafkaProducer) Write(s string) {
 		Topic: k.topic,
 		Value: sarama.StringEncoder(s),
 	}
+	k.msgTx.Inc(1)
+	k.bytesTx.Inc(int64(len(s)))
+}
+
+// GetStatistics returns an object storing statistics, which supports JSON
+// marshalling.
+func (k *KafkaProducer) GetStatistics() (metrics.Registry, error) {
+	return k.registry, nil
 }
 
 func (k *KafkaProducer) Close() error {

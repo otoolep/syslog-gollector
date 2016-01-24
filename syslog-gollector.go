@@ -34,6 +34,7 @@ var noReport bool
 var tcpServer *input.TcpServer
 var udpServer *input.UdpServer
 var parser *input.Rfc5424Parser
+var producer *output.KafkaProducer
 
 // Diagnostic data
 var startTime time.Time
@@ -82,7 +83,7 @@ func isPretty(req *http.Request) (bool, error) {
 // ServeStatistics returns the statistics for the program
 func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	statistics := make(map[string]interface{})
-	resources := map[string]input.Statistics{"tcp": tcpServer, "udp": udpServer, "parser": parser}
+	resources := map[string]input.Statistics{"tcp": tcpServer, "udp": udpServer, "parser": parser, "producer": producer}
 	for k, v := range resources {
 		s, err := v.GetStatistics()
 		if err != nil {
@@ -218,7 +219,7 @@ func main() {
 
 	// Write messages until program is terminated.
 	for {
-		kafka.Write(<-prodChan)
+		producer.Write(<-prodChan)
 	}
 }
 
