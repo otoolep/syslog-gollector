@@ -56,8 +56,8 @@ const (
 
 func init() {
 	flag.StringVar(&adminIface, "admin", adminHost, "Admin interface")
-	flag.StringVar(&tcpIface, "tcp", connTcpHost, "TCP bind interface")
-	flag.StringVar(&udpIface, "udp", connUdpHost, "UDP interface")
+	flag.StringVar(&tcpIface, "tcp", connTcpHost, "TCP bind interface. If set to empty string, not enabled")
+	flag.StringVar(&udpIface, "udp", connUdpHost, "UDP interface. If set to empty string, not enabled")
 	flag.StringVar(&kBrokers, "broker", kafkaBrokers, "comma-delimited kafka brokers")
 	flag.StringVar(&kTopic, "topic", kafkaTopic, "kafka topic")
 	flag.IntVar(&kBatch, "batch", kafkaBatch, "Kafka batch size")
@@ -85,6 +85,11 @@ func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	statistics := make(map[string]interface{})
 	resources := map[string]input.Statistics{"tcp": tcpServer, "udp": udpServer, "parser": parser, "producer": producer}
 	for k, v := range resources {
+		if v == nil {
+			// No stats for uninitialized resources
+			continue
+		}
+
 		s, err := v.GetStatistics()
 		if err != nil {
 			log.Println("failed to get " + k + " stats")
@@ -172,25 +177,29 @@ func main() {
 	}
 
 	// Start the event servers
-	tcpServer = input.NewTcpServer(tcpIface)
-	err = tcpServer.Start(func() chan<- string {
-		return rawChan
-	})
-	if err != nil {
-		fmt.Println("Failed to start TCP server", err.Error())
-		os.Exit(1)
+	if tcpIface != "" {
+		tcpServer = input.NewTcpServer(tcpIface)
+		err = tcpServer.Start(func() chan<- string {
+			return rawChan
+		})
+		if err != nil {
+			fmt.Println("Failed to start TCP server", err.Error())
+			os.Exit(1)
+		}
+		log.Printf("listening on %s for TCP connections", tcpIface)
 	}
-	log.Printf("listening on %s for TCP connections", tcpIface)
 
-	udpServer = input.NewUdpServer(udpIface)
-	err = udpServer.Start(func() chan<- string {
-		return rawChan
-	})
-	if err != nil {
-		fmt.Println("Failed to start UDP server", err.Error())
-		os.Exit(1)
+	if udpIface != "" {
+		udpServer = input.NewUdpServer(udpIface)
+		err = udpServer.Start(func() chan<- string {
+			return rawChan
+		})
+		if err != nil {
+			fmt.Println("Failed to start UDP server", err.Error())
+			os.Exit(1)
+		}
+		log.Printf("listening on %s for UDP packets", udpIface)
 	}
-	log.Printf("listening on %s for UDP packets", udpIface)
 
 	// Configure and start the Admin server
 	http.HandleFunc("/statistics", ServeStatistics)
