@@ -1,42 +1,41 @@
 package output
 
 import (
-	"log"
-
-	"github.com/otoolep/sarama"
+	"github.com/Shopify/sarama"
 )
 
 // A KafkaProducer encapsulates a connection to a Kafka cluster.
 type KafkaProducer struct {
+	producer sarama.AsyncProducer
+	topic    string
 }
 
 // Returns an initialized KafkaProducer.
-func NewKafkaProducer(msgChan <-chan string, brokers []string, topic string, bufferTime, bufferBytes int) (*KafkaProducer, error) {
-	self := &KafkaProducer{}
+func NewKafkaProducer(brokers []string, topic string, bufferTime, bufferBytes int) (*KafkaProducer, error) {
+	config := sarama.NewConfig()
+	config.Producer.RequiredAcks = sarama.WaitForLocal     // Only wait for the leader to ack
+	config.Producer.Compression = sarama.CompressionSnappy // Compress messages
 
-	clientConfig := sarama.NewClientConfig()
-	client, err := sarama.NewClient("gocollector", brokers, clientConfig)
+	p, err := sarama.NewAsyncProducer(brokers, config)
 	if err != nil {
-		log.Println("failed to create kafka client", err)
 		return nil, err
 	}
-
-	producerConfig := sarama.NewProducerConfig()
-	producerConfig.Partitioner = sarama.NewRandomPartitioner()
-	producerConfig.MaxBufferedBytes = uint32(bufferBytes)
-	producerConfig.MaxBufferTime = uint32(bufferTime)
-	producer, err := sarama.NewProducer(client, producerConfig)
-	if err != nil {
-		log.Println("failed to create kafka producer", err)
-		return nil, err
+	k := &KafkaProducer{
+		producer: p,
+		topic:    topic,
 	}
 
-	go func() {
-		for message := range msgChan {
-			producer.QueueMessage(topic, nil, sarama.StringEncoder(message))
-		}
-	}()
+	return k, nil
+}
 
-	log.Println("kafka producer created")
-	return self, nil
+func (k *KafkaProducer) Write(s string) {
+	k.producer.Input() <- &sarama.ProducerMessage{
+		Topic: k.topic,
+		Key:   sarama.StringEncoder("xxx"),
+		Value: nil,
+	}
+}
+
+func (k *KafkaProducer) Close() error {
+	return k.producer.Close()
 }

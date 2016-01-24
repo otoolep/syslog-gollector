@@ -205,7 +205,7 @@ func main() {
 
 	// Connect to Kafka
 	log.Println("attempting to connect to Kafka %s...", kBrokers)
-	_, err = output.NewKafkaProducer(prodChan, strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
+	kafka, err := output.NewKafkaProducer(strings.Split(kBrokers, ","), kTopic, kBufferTime, kBufferBytes)
 	if err != nil {
 		fmt.Println("Failed to create Kafka producer", err.Error())
 		os.Exit(1)
@@ -216,8 +216,10 @@ func main() {
 		reportLaunch()
 	}
 
-	// Spin forever
-	select {}
+	// Write messages until program is terminated.
+	for {
+		kafka.Write(<-prodChan)
+	}
 }
 
 func reportLaunch() {
