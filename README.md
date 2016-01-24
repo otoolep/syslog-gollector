@@ -87,7 +87,7 @@ Dependencies
 ------------
 The most significant dependencies are:
 
-* The Kafka 0.8 client [sarama](https://github.com/Shopify/sarama).
+* The Kafka client [sarama](https://github.com/Shopify/sarama).
 * The unit-test framework [Package check](https://gopkg.in/check.v1).
 * [go-metrics](https://github.com/rcrowley/go-metrics) for statistics support.
 
