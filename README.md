@@ -48,13 +48,17 @@ Tested on 64-bit Kubuntu 14.04.
     cd ~/syslog-gollector
     export GOPATH=$PWD
     go get github.com/otoolep/syslog-gollector
-    go install github.com/otoolep/syslog-gollector
 
 To run the tests execute:
 
     go get gopkg.in/check.v1
     go test github.com/otoolep/syslog-gollector/...
+    
+If you want to hack on the source then modify it and rebuild like so (or whatever you're Go workflow is):
 
+    cd $GOPATH/github.com/otoolep/syslog-gollector
+    ....hack, hack,....
+    go install
 
 Running
 ------------
