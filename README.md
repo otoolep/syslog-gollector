@@ -78,7 +78,7 @@ syslog-ng looks like so:
 
 Admin Control
 ------------
-The syslog-gollector exposes a number of HTTP endpoints, for configuration and management. The Admin server runs on localhost:8080 by default.
+The syslog-gollector exposes a number of HTTP endpoints, for general statistics and diagnostics. This Admin server runs on localhost:8080 by default.
 
     /statistics
     /diagnostics
