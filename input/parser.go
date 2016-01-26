@@ -53,9 +53,9 @@ func NewRfc5424Parser() *Rfc5424Parser {
 	return p
 }
 
-// GetStatistics returns an object storing statistics, which supports JSON
+// Statistics returns an object storing statistics, which supports JSON
 // marshalling.
-func (p *Rfc5424Parser) GetStatistics() (metrics.Registry, error) {
+func (p *Rfc5424Parser) Statistics() (metrics.Registry, error) {
 	return p.registry, nil
 }
 

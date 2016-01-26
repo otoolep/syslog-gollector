@@ -15,6 +15,7 @@ import (
 
 	"github.com/otoolep/syslog-gollector/input"
 	"github.com/otoolep/syslog-gollector/output"
+	"github.com/rcrowley/go-metrics"
 )
 
 // Program parameters
@@ -38,6 +39,11 @@ var producer *output.KafkaProducer
 
 // Diagnostic data
 var startTime time.Time
+
+// Statistics is the interface systems that provide statistics must support.
+type Statistics interface {
+	Statistics() (metrics.Registry, error)
+}
 
 // Types
 const (
@@ -83,14 +89,14 @@ func isPretty(req *http.Request) (bool, error) {
 // ServeStatistics returns the statistics for the program
 func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	statistics := make(map[string]interface{})
-	resources := map[string]input.Statistics{"tcp": tcpServer, "udp": udpServer, "parser": parser, "producer": producer}
+	resources := map[string]Statistics{"tcp": tcpServer, "udp": udpServer, "parser": parser, "producer": producer}
 	for k, v := range resources {
 		if v == nil {
 			// No stats for uninitialized resources
 			continue
 		}
 
-		s, err := v.GetStatistics()
+		s, err := v.Statistics()
 		if err != nil {
 			log.Println("failed to get " + k + " stats")
 			http.Error(w, "failed to get "+k+" stats", http.StatusInternalServerError)

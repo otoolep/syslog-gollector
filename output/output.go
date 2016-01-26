@@ -54,9 +54,9 @@ func (k *KafkaProducer) Write(s string) {
 	k.bytesTx.Inc(int64(len(s)))
 }
 
-// GetStatistics returns an object storing statistics, which supports JSON
+// Statistics returns an object storing statistics, which supports JSON
 // marshalling.
-func (k *KafkaProducer) GetStatistics() (metrics.Registry, error) {
+func (k *KafkaProducer) Statistics() (metrics.Registry, error) {
 	return k.registry, nil
 }
 

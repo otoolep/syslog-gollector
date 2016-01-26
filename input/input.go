@@ -23,9 +23,9 @@ type server struct {
 	bytesRx  metrics.Counter
 }
 
-// GetStatistics returns an object storing statistics, which supports JSON
+// Statistics returns an object storing statistics, which supports JSON
 // marshalling.
-func (s *server) GetStatistics() (metrics.Registry, error) {
+func (s *server) Statistics() (metrics.Registry, error) {
 	return s.registry, nil
 }
 
