@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -29,7 +28,6 @@ var kBufferTime int
 var kBufferBytes int
 var pEnabled bool
 var cCapacity int
-var noReport bool
 
 // Program resources
 var tcpServer *input.TcpServer
@@ -71,7 +69,6 @@ func init() {
 	flag.IntVar(&kBufferBytes, "maxbytes", kafkaBufferBytes, "Kafka client buffer max bytes")
 	flag.BoolVar(&pEnabled, "parse", parseEnabled, "enable syslog header parsing")
 	flag.IntVar(&cCapacity, "chancap", chanCapacity, "channel buffering capacity")
-	flag.BoolVar(&noReport, "noreport", false, "disable anonymized launch reporting")
 }
 
 // isPretty returns whether the HTTP response body should be pretty-printed.
@@ -228,20 +225,8 @@ func main() {
 	}
 	log.Printf("connected to Kafka at %s", kBrokers)
 
-	if !noReport {
-		reportLaunch()
-	}
-
 	// Write messages until program is terminated.
 	for {
 		producer.Write(<-prodChan)
 	}
-}
-
-func reportLaunch() {
-	json := fmt.Sprintf(`{"os": "%s", "arch": "%s", "app": "gollector"}`, runtime.GOOS, runtime.GOARCH)
-	data := bytes.NewBufferString(json)
-	client := http.Client{Timeout: time.Duration(5 * time.Second)}
-	go client.Post("https://logs-01.loggly.com/inputs/8a0edd84-92ba-46e4-ada8-c529d0f105af/tag/reporting/",
-		"application/json", data)
 }
