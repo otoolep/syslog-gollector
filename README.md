@@ -53,7 +53,7 @@ To run the tests execute:
 
     go get gopkg.in/check.v1
     go test github.com/otoolep/syslog-gollector/...
-    
+
 If you want to hack on the source then modify it and rebuild like so (or whatever you're Go workflow is):
 
     cd $GOPATH/github.com/otoolep/syslog-gollector
@@ -103,8 +103,3 @@ This code is still work-in-progress, and issues are being tracked. Other key tas
 
 * Throughput needs to be measured.
 * Run the program through Go's race-detector.
-
-
-Reporting
-------------
-syslog-gollector reports a small amount anonymous data to Loggly, each time it is launched. This data is just the host operating system and system architecture and is only used to track the number of syslog-gollector deployments. Reporting can be disabled by passing `-noreport=true` to syslog-gollector at launch time.
