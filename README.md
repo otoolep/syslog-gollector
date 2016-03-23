@@ -3,7 +3,7 @@ syslog-gollector [![Circle CI](https://circleci.com/gh/otoolep/syslog-gollector/
 
 *Detailed background on syslog-gollector can be found on [this blog post](http://www.philipotoole.com/writing-a-syslog-collector-in-go/).*
 
-*syslog-gollector* is a Syslog Collector (sometimes called a Syslog Server), written in [Go](http://golang.org/) (golang), which has support for streaming received log messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. Log messages can be written to Kafka in parsed format, or written exactly as received.
+*syslog-gollector* is a [Syslog](https://en.wikipedia.org/wiki/Syslog) Collector (sometimes called a Syslog Server), written in [Go](http://golang.org/) (golang), which has support for streaming received log messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. Log messages can be written to Kafka in parsed format, or written exactly as received.
 
 The logs lines must be [RFC5424](http://tools.ietf.org/html/rfc5424) compliant, and in the following format:
 
@@ -11,7 +11,7 @@ The logs lines must be [RFC5424](http://tools.ietf.org/html/rfc5424) compliant, 
 
 Consult the RFC to learn what each of these fields is. The TIMESTAMP field must be in [RFC3339](http://www.ietf.org/rfc/rfc3339.txt) format. Lines not matching this format are dropped by the syslog-gollector.
 
-Checking out the "Running" section for hints on how to suitably configure Syslog clients.
+Check out the "Running" section for hints on how to easily configure Syslog clients to emit log mesages in the right format.
 
 Multi-line Support
 ------------
@@ -27,16 +27,18 @@ For example, imagine the following log line is received by the syslog-gollector:
 
 With parsing disabled, the line is written as is to Kafka. With parsing enabled, the following JSON object is instead written to Kafka:
 
-    {
-        "priority":134,
-        "version":1,
-        "timestamp":"2013-09-04T10:25:52.618085",
-        "host":"ubuntu",
-        "app":"sshd",
-        "pid":1999,
-        "msgid": "-",
-        "message": "password accepted for user root"
-    }
+```json
+{
+    "priority":134,
+    "version":1,
+    "timestamp":"2013-09-04T10:25:52.618085",
+    "host":"ubuntu",
+    "app":"sshd",
+    "pid":1999,
+    "msgid": "-",
+    "message": "password accepted for user root"
+}
+```
 
 This parsed form may be useful to downstream consumers.
 
@@ -44,27 +46,34 @@ Building
 ------------
 Tested on 64-bit Kubuntu 14.04.
 
-    mkdir ~/syslog-gollector # Or a directory of your choice.
-    cd ~/syslog-gollector
-    export GOPATH=$PWD
-    go get github.com/otoolep/syslog-gollector
+```bash
+mkdir ~/syslog-gollector # Or a directory of your choice.
+cd ~/syslog-gollector
+export GOPATH=$PWD
+go get github.com/otoolep/syslog-gollector
+```
 
 To run the tests execute:
+```bash
+go get gopkg.in/check.v1
+go test github.com/otoolep/syslog-gollector/...
+```
 
-    go get gopkg.in/check.v1
-    go test github.com/otoolep/syslog-gollector/...
+If you want to hack on the source then modify it and rebuild like so (or whatever your Go workflow is):
 
-If you want to hack on the source then modify it and rebuild like so (or whatever you're Go workflow is):
-
-    cd $GOPATH/github.com/otoolep/syslog-gollector
-    ....hack, hack,....
-    go install
+```bash
+cd $GOPATH/github.com/otoolep/syslog-gollector
+....hack, hack,....
+go install
+```
 
 Running
 ------------
 The binary will be located in the ```$GOPATH/bin``` directory. Execute
 
-        syslog-gollector -h
+```bash
+syslog-gollector -h
+```
 
 for command-line options.
 
@@ -85,7 +94,9 @@ The syslog-gollector exposes a number of HTTP endpoints, for general statistics 
 
 Adding the query parameter `pretty` to the URL will produce pretty-printed output. For example:
 
-    curl 'localhost:8080/statistics?pretty'
+```bash
+curl 'localhost:8080/statistics?pretty'
+```
 
 Dependencies
 ------------
