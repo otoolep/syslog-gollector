@@ -1,7 +1,7 @@
 syslog-gollector [![Circle CI](https://circleci.com/gh/otoolep/syslog-gollector/tree/master.svg?style=svg)](https://circleci.com/gh/otoolep/syslog-gollector/tree/master)
 ========
 
-*Detailed background on syslog-gollector can be found on [this blog post](http://www.philipotoole.com/writing-a-syslog-collector-in-go/).*
+*Detailed background on syslog-gollector can be found on [these blog posts](http://www.philipotoole.com/tag/syslog-gollector/).*
 
 *syslog-gollector* is a [Syslog](https://en.wikipedia.org/wiki/Syslog) Collector (sometimes called a Syslog Server), written in [Go](http://golang.org/) (golang), which has support for streaming received log messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. Log messages can be written to Kafka in parsed format, or written exactly as received.
 
