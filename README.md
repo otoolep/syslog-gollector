@@ -3,7 +3,7 @@ syslog-gollector [![Circle CI](https://circleci.com/gh/otoolep/syslog-gollector/
 
 *Detailed background on syslog-gollector can be found on [these blog posts](http://www.philipotoole.com/tag/syslog-gollector/).*
 
-*syslog-gollector* is a [Syslog](https://en.wikipedia.org/wiki/Syslog) Collector (sometimes called a Syslog Server), written in [Go](http://golang.org/) (golang), which has support for streaming received log messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. Log messages can be written to Kafka in parsed format, or written exactly as received.
+*syslog-gollector* is a [Syslog](https://en.wikipedia.org/wiki/Syslog) Collector (sometimes called a Syslog Server), written in [Go](http://golang.org/) (golang), which has support for writing received log messages to [Apache Kafka](https://kafka.apache.org/), version 0.8. Log messages can be written to Kafka in parsed format, or written exactly as received.
 
 The logs lines must be [RFC5424](http://tools.ietf.org/html/rfc5424) compliant, and in the following format:
 
@@ -25,7 +25,7 @@ For example, imagine the following log line is received by the syslog-gollector:
 
     <134>1 2013-09-04T10:25:52.618085 ubuntu sshd 1999 - password accepted for user root
 
-With parsing disabled, the line is written as is to Kafka. With parsing enabled, the following JSON object is instead written to Kafka:
+With parsing disabled, the line is written as-is to Kafka. With parsing enabled, the following JSON object is instead written to Kafka:
 
 ```json
 {
