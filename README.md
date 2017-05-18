@@ -98,16 +98,6 @@ Adding the query parameter `pretty` to the URL will produce pretty-printed outpu
 curl 'localhost:8080/statistics?pretty'
 ```
 
-Dependencies
-------------
-The most significant dependencies are:
-
-* The Kafka client [sarama](https://github.com/Shopify/sarama).
-* The unit-test framework [Package check](https://gopkg.in/check.v1).
-* [go-metrics](https://github.com/rcrowley/go-metrics) for statistics support.
-
-Thanks to the creators of these packages.
-
 TODO
 ------------
 This code is still work-in-progress, and issues are being tracked. Other key tasks that span multiple issues include:
