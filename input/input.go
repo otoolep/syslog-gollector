@@ -65,7 +65,7 @@ func (s *TcpServer) Start(f func() chan<- string) error {
 				log.Println("failed to accept connection", err)
 				continue
 			}
-			log.Println("accepted new connection from %s", conn.RemoteAddr().String())
+			log.Println("accepted new connection from", conn.RemoteAddr().String())
 			go s.handleConnection(conn, f)
 		}
 	}()
