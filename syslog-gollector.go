@@ -161,7 +161,7 @@ func main() {
 	log.Println("kafka brokers:", kBrokers)
 	log.Println("kafka topic:", kTopic)
 	log.Println("kafka batch size:", kBatch)
-	log.Printf("kafka buffer time: %dms", kBufferTime)
+	log.Printf("kafka buffer time:", kBufferTime)
 	log.Println("kafka buffer bytes:", kBufferBytes)
 	log.Println("parsing enabled:", pEnabled)
 	log.Println("channel buffering capacity:", cCapacity)
