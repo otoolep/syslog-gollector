@@ -1,4 +1,4 @@
-syslog-gollector [![Circle CI](https://circleci.com/gh/otoolep/syslog-gollector/tree/master.svg?style=svg)](https://circleci.com/gh/otoolep/syslog-gollector/tree/master)
+syslog-gollector [![Circle CI](https://circleci.com/gh/otoolep/syslog-gollector/tree/master.svg?style=svg)](https://circleci.com/gh/otoolep/syslog-gollector/tree/master)  [![Go Report Card](https://goreportcard.com/badge/github.com/otoolep/syslog-gollector)](https://goreportcard.com/report/github.com/otoolep/syslog-gollector) 
 ========
 
 *Detailed background on syslog-gollector can be found on [these blog posts](http://www.philipotoole.com/tag/syslog-gollector/).*
