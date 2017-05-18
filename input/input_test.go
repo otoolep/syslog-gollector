@@ -138,8 +138,8 @@ func (s *InputSuite) Test_SuccessfulParsing(c *C) {
 	e = ParsedMessage{Priority: 29, Version: 1, Timestamp: "2015-03-03T06:49:08-08:00", Host: "localhost.localdomain", App: "puppet-agent", Pid: 51564, MsgId: "-", Message: "(/Stage[main]/Users_prd/Ssh_authorized_key[1063-username]) Dependency Group[group] has failures: true"}
 	c.Assert(*m, Equals, e)
 
-	m = p.Parse("<142>1 2015-03-02T22:23:07-08:00 localhost.localdomain Keepalived_vrrp 21125 - VRRP_Instance(VI_1) ignoring received advertisment...")
-	e = ParsedMessage{Priority: 142, Version: 1, Timestamp: "2015-03-02T22:23:07-08:00", Host: "localhost.localdomain", App: "Keepalived_vrrp", Pid: 21125, MsgId: "-", Message: "VRRP_Instance(VI_1) ignoring received advertisment..."}
+	m = p.Parse("<142>1 2015-03-02T22:23:07-08:00 localhost.localdomain Keepalived_vrrp 21125 - VRRP_Instance(VI_1) ignoring received advertisement...")
+	e = ParsedMessage{Priority: 142, Version: 1, Timestamp: "2015-03-02T22:23:07-08:00", Host: "localhost.localdomain", App: "Keepalived_vrrp", Pid: 21125, MsgId: "-", Message: "VRRP_Instance(VI_1) ignoring received advertisement..."}
 	c.Assert(*m, Equals, e)
 }
 
