@@ -153,7 +153,7 @@ func main() {
 	if err != nil {
 		log.Fatal("unable to determine hostname -- aborting")
 	}
-	log.Println("syslog server starting on %s, PID %d", hostname, os.Getpid())
+	log.Printf("syslog server starting on %s, PID %d", hostname, os.Getpid())
 	log.Printf("machine has %d cores", runtime.NumCPU())
 
 	// Log config
@@ -161,7 +161,7 @@ func main() {
 	log.Println("kafka brokers:", kBrokers)
 	log.Println("kafka topic:", kTopic)
 	log.Println("kafka batch size:", kBatch)
-	log.Printf("kafka buffer time:", kBufferTime)
+	log.Println("kafka buffer time:", kBufferTime)
 	log.Println("kafka buffer bytes:", kBufferBytes)
 	log.Println("parsing enabled:", pEnabled)
 	log.Println("channel buffering capacity:", cCapacity)
