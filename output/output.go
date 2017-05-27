@@ -18,7 +18,7 @@ type KafkaProducer struct {
 	bytesTx  metrics.Counter
 }
 
-// Returns an initialized KafkaProducer.
+// NewKafkaProducer returns an initialized KafkaProducer.
 func NewKafkaProducer(brokers []string, topic string, bufferTime, bufferBytes, batchSz int) (*KafkaProducer, error) {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForLocal     // Only wait for the leader to ack
@@ -60,6 +60,7 @@ func (k *KafkaProducer) Statistics() (metrics.Registry, error) {
 	return k.registry, nil
 }
 
+// Close closes the producer.
 func (k *KafkaProducer) Close() error {
 	return k.producer.Close()
 }

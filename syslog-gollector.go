@@ -118,6 +118,7 @@ func ServeStatistics(w http.ResponseWriter, req *http.Request) {
 	w.Write(b)
 }
 
+// ServeDiagnostics serves diagnostic and status information about the server.
 func ServeDiagnostics(w http.ResponseWriter, req *http.Request) {
 	diagnostics := make(map[string]string)
 	diagnostics["started"] = startTime.String()
