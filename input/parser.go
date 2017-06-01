@@ -28,7 +28,7 @@ type ParsedMessage struct {
 	Message   string `json:"message"`
 }
 
-// Returns an initialized Rfc5424Parser.
+// NewRfc5424Parser Returns an initialized Rfc5424Parser.
 func NewRfc5424Parser() *Rfc5424Parser {
 	leading := `(?s)`
 	pri := `<([0-9]{1,3})>`
