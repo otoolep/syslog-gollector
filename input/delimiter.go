@@ -41,7 +41,7 @@ func NewDelimiter(maxSize int) *Delimiter {
 // Push a byte into the Delimiter. If the byte results in a
 // a new Syslog message, it'll be flagged via the bool.
 func (d *Delimiter) Push(b byte) (string, bool) {
-	d.buffer = append(self.buffer, b)
+	d.buffer = append(d.buffer, b)
 	delimiter := d.regex.FindIndex(d.buffer)
 	if delimiter == nil {
 		return "", false
