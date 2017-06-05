@@ -14,6 +14,7 @@ var syslogRegex *regexp.Regexp
 var startRegex *regexp.Regexp
 var runRegex *regexp.Regexp
 
+// Reader is the interface objects passed to the Delimiter must support.
 type Reader interface {
 	ReadByte() (byte, error)
 }
